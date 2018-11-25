@@ -21,21 +21,21 @@ public:
 
 	
 	// Vertex for top level graph - search top graph for final answer
-	vector<int> m_WayPtAssignment;			/* 	M vector: 	each waypoint is assigned to a robot 	*/
-	int m_lastAssigned;						/* 	int id:		last waypoint to be assigned 			*/
-	vector<double> m_WayPtAssignmentCosts;	/*	N vector:	cost of assigning waypts to each robot	*/
+	vector<int> m_WayPtAssignment;         /*  M vector:   each waypoint is assigned to a robot    */
+	int m_lastAssigned;	                   /*  int id:     last waypoint to be assigned            */
+	vector<double> m_WayPtAssignmentCosts; /*  N vector:   cost of assigning waypts to each robot  */
 	
 
 
 	// Vertex for mid level graph - one mid graph per robot
-	vector<bool> m_WayPtVisitation;			/*	M vector:	which waypoints have been visited?		*/
-	int m_lastVisited;						/*	int id:		which waypoint was visited last?		*/
+	vector<bool> m_WayPtVisitation;        /*  M vector:   which waypoints have been visited?      */
+	int m_lastVisited;                     /*  int id:     which waypoint was visited last?        */
 
 
-	GraphVertex* m_parent;					/* 	vertex parent 	*/
-	double m_gValue;						/* 	cost from start */
-	double m_hValue;						/*	heuristic value */
-	double m_fValue;						/* 	priority value 	*/
+	GraphVertex* m_parent;                 /*  vertex parent   */
+	double m_gValue;                       /*  cost from start */
+	double m_hValue;                       /*  heuristic value */
+	double m_fValue;                       /*  priority value  */
 	
 
 };
