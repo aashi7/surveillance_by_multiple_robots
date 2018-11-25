@@ -1,6 +1,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
+#include <algorithm>
 #include <limits>
 #include <cmath>
 
@@ -72,6 +73,16 @@ GraphVertex* MultiSurveillance::TopSearch()
             robot_s = s->m_WayPtAssignment[s->m_lastAssigned-1];
             gVal_s = gVal + (s->m_WayPtAssignmentCosts[robot_s-1] - 
                           curr->m_WayPtAssignmentCosts[robot_s-1]);
+
+            // In case some robot has not been assigned any waypoint,
+            // add the cost for that robot to  its goal.
+            if(s->m_lastAssigned == m_numWayPts)
+            {
+                for(int i = 0; i < m_numRobots; i++)
+                    if(find(s->m_WayPtAssignment.begin(), s->m_WayPtAssignment.end(), i+1)
+                        == s->m_WayPtAssignment.end())
+                        gVal_s += MidSearch(s,i+1);
+            }
             s->SetFValue(gVal_s,0);
             open.push(s);
             cout << "\nTop Successor:";
