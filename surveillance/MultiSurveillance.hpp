@@ -13,6 +13,7 @@ public:
     ~MultiSurveillance();
 
     vector<GraphVertex*> GetSuccessorsTop(GraphVertex* vertex);
+    double TopPathCost(GraphVertex* current, GraphVertex* successor);
     GraphVertex* TopSearch();
 
     vector<GraphVertex*> GetSuccessorsMid(GraphVertex* vertex, GraphVertex* end);

@@ -43,6 +43,25 @@ vector<GraphVertex*> MultiSurveillance::GetSuccessorsTop(GraphVertex* vertex)
     return succ;
 }
 
+double MultiSurveillance::TopPathCost(GraphVertex* current, GraphVertex* successor)
+{
+    int robot_s = successor->m_WayPtAssignment[successor->m_lastAssigned-1];
+    double gVal_s = current->m_gValue + (successor->m_WayPtAssignmentCosts[robot_s-1] - 
+                  current->m_WayPtAssignmentCosts[robot_s-1]);
+
+    // In case some robot has not been assigned any waypoint,
+    // add the cost for that robot to its goal.
+    if(successor->m_lastAssigned == m_numWayPts)
+    {
+        for(int i = 0; i < m_numRobots; i++)
+            if(find(successor->m_WayPtAssignment.begin(), 
+                successor->m_WayPtAssignment.end(), i+1)
+                == successor->m_WayPtAssignment.end())
+                gVal_s += MidSearch(successor,i+1);
+    }
+    return gVal_s;
+}
+
 GraphVertex* MultiSurveillance::TopSearch()
 {
     priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority> open;
@@ -70,19 +89,7 @@ GraphVertex* MultiSurveillance::TopSearch()
         succ = GetSuccessorsTop(curr);
         for(GraphVertex* s: succ)
         {
-            robot_s = s->m_WayPtAssignment[s->m_lastAssigned-1];
-            gVal_s = gVal + (s->m_WayPtAssignmentCosts[robot_s-1] - 
-                          curr->m_WayPtAssignmentCosts[robot_s-1]);
-
-            // In case some robot has not been assigned any waypoint,
-            // add the cost for that robot to  its goal.
-            if(s->m_lastAssigned == m_numWayPts)
-            {
-                for(int i = 0; i < m_numRobots; i++)
-                    if(find(s->m_WayPtAssignment.begin(), s->m_WayPtAssignment.end(), i+1)
-                        == s->m_WayPtAssignment.end())
-                        gVal_s += MidSearch(s,i+1);
-            }
+            gVal_s = TopPathCost(curr,s);
             s->SetFValue(gVal_s,0);
             open.push(s);
             cout << "\nTop Successor:";
