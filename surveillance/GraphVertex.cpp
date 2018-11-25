@@ -1,4 +1,10 @@
 #include "GraphVertex.hpp"
+
+#include <vector>
+#include <limits>
+#include <iostream>
+#define D_INF numeric_limits<double>::infinity()
+
 using namespace std;
 
 GraphVertex::GraphVertex(){}
@@ -27,3 +33,26 @@ void GraphVertex::SetFValue(double gVal, double hVal)
     m_fValue = gVal + hVal;
 }
 
+ostream& operator<<(ostream& os, const GraphVertex& vertex)
+{
+    if((vertex.m_WayPtAssignment).size() > 0)
+    {
+        os << "\nWay Point Assignment: ";
+        for(auto i: vertex.m_WayPtAssignment)
+            os << i << " ";
+        os << "\nPer Robot Costs: ";
+        for(auto i: vertex.m_WayPtAssignmentCosts)
+            os << i << " ";
+        os << "\nLast Way Point Assigned: " << vertex.m_lastAssigned;
+    }
+
+    if((vertex.m_WayPtVisitation).size() > 0)
+    {
+        os << "\nWay Points Visited: ";
+        for(auto i: vertex.m_WayPtVisitation)
+            os << i << " ";
+        os << "\nLast Way Point Visited: " << vertex.m_lastVisited;
+    }
+    os << "\nG-Value: " << vertex.m_gValue;
+    return os;
+}

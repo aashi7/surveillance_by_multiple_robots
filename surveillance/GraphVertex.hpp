@@ -2,8 +2,7 @@
 #define GRAPHVERTEX_HPP
 
 #include <vector>
-#include <limits>
-#define D_INF numeric_limits<double>::infinity()
+#include <iostream>
 
 using namespace std;
 
@@ -18,7 +17,7 @@ public:
     ~GraphVertex();
 
     void SetFValue(double gVal, double hVal);
-
+    friend ostream& operator<<(ostream& os, const GraphVertex& vertex);
 
     // Vertex for top level graph - search top graph for final answer
     vector<int> m_WayPtAssignment;         /*  M vector:   each waypoint is assigned to a robot    */
