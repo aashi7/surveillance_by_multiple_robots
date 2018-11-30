@@ -10,21 +10,23 @@ public:
 
     MultiSurveillance(int M, int N, vector<pair<int,int>> wayPts, 
         vector<pair<int,int>> starts, vector<pair<int,int>> goals,
-        double* costmap, int xsz, int ysz);
+        double* costmap, double collision_thresh, int xsz, int ysz);
     ~MultiSurveillance();
 
-    vector<GraphVertex*> GetSuccessorsTop(GraphVertex* vertex,unordered_map<int,GraphVertex*> vertices);
-    double TopPathCost(GraphVertex* current, GraphVertex* successor);
     int TopHash(GraphVertex* vertex);
+    vector<GraphVertex*> TopSuccessors(GraphVertex* vertex);
+    double TopPathCost(GraphVertex* current, GraphVertex* successor);
     GraphVertex* TopSearch();
 
-    vector<GraphVertex*> GetSuccessorsMid(GraphVertex* vertex, GraphVertex* end);
-    GraphVertex* GetMidVertex(GraphVertex* goal, int robot);
+    GraphVertex* MidVertex(GraphVertex* goal, int robot);
     int MidHash(GraphVertex* vertex);
+    vector<GraphVertex*> MidSuccessors(GraphVertex* vertex, GraphVertex* end);
+    double MidPathCost(GraphVertex* current, GraphVertex* successor, int robot);
     double MidSearch(GraphVertex* goal, int robot);
 
-    vector<GraphVertex*> GetSuccessorsLow(GraphVertex* vertex);
     int LowHash(GraphVertex* vertex);
+    vector<GraphVertex*> LowSuccessors(GraphVertex* vertex);
+    double LowPathCost(GraphVertex* current, GraphVertex* successor);
     double LowSearch(GraphVertex* start, GraphVertex* goal, int robot);
 
     int m_numWayPts;
@@ -33,9 +35,10 @@ public:
     vector<pair<int,int>> m_starts;
     vector<pair<int,int>> m_goals;
 
+    double* m_costmap;
+    double m_collThreshold;
     int m_mapXsize;
     int m_mapYsize;
-    double* m_costmap;
 
 };
 

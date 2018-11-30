@@ -6,8 +6,6 @@
 
 #include "MultiSurveillance.hpp"
 #include "ComparePriority.cpp"
-#include "HashTop.cpp"
-#include "HashMid.cpp"
 
 #define D_INF numeric_limits<double>::infinity()
 using namespace std;
@@ -34,7 +32,7 @@ int main()
 
 	int M = wayPts.size(), N = starts.size();
 
-	MultiSurveillance *MS = new MultiSurveillance(M,N,wayPts,starts,goals,NULL,0,0);
+	MultiSurveillance *MS = new MultiSurveillance(M,N,wayPts,starts,goals,NULL,0,0,0);
 	cout << "Path cost = " << (MS->TopSearch())->m_gValue << '\n';
 
 	return 0; 
