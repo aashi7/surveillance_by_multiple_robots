@@ -18,9 +18,13 @@ int main()
 	
 	starts.push_back({0,0});
 	starts.push_back({10,10});
-	
+	starts.push_back({0,10});
+	starts.push_back({10,0});
+
 	goals.push_back({10,10});
 	goals.push_back({0,0});
+	goals.push_back({10,0});
+	goals.push_back({0,10});
 
 	wayPts.push_back({3,7});
 	wayPts.push_back({7,7});
@@ -30,7 +34,7 @@ int main()
 
 	int M = wayPts.size(), N = starts.size();
 
-	MultiSurveillance *MS = new MultiSurveillance(M,N,wayPts,starts,goals);
+	MultiSurveillance *MS = new MultiSurveillance(M,N,wayPts,starts,goals,NULL,0,0);
 	cout << "Path cost = " << (MS->TopSearch())->m_gValue << '\n';
 
 	return 0; 

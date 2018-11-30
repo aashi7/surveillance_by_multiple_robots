@@ -24,6 +24,12 @@ GraphVertex::GraphVertex(vector<bool> wayPtsDone, int lastWayPt)
     m_lastVisited = lastWayPt;
 }
 
+GraphVertex::GraphVertex(pair<int,int> indices, int xsz, int ysz)
+{
+    m_X = indices.first; m_Y = indices.second;
+    m_Xsz = xsz; m_Ysz = ysz;
+}
+
 GraphVertex::~GraphVertex(){}
 
 void GraphVertex::SetFValue(double gVal, double hVal)

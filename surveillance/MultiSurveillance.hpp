@@ -9,18 +9,22 @@ class MultiSurveillance
 public:
 
     MultiSurveillance(int M, int N, vector<pair<int,int>> wayPts, 
-        vector<pair<int,int>> starts, vector<pair<int,int>> goals);
+        vector<pair<int,int>> starts, vector<pair<int,int>> goals,
+        double* costmap, int xsz, int ysz);
     ~MultiSurveillance();
 
-    vector<GraphVertex*> GetSuccessorsTop(GraphVertex* vertex);
+    vector<GraphVertex*> GetSuccessorsTop(GraphVertex* vertex,unordered_map<int,GraphVertex*> vertices);
     double TopPathCost(GraphVertex* current, GraphVertex* successor);
+    int TopHash(GraphVertex* vertex);
     GraphVertex* TopSearch();
 
     vector<GraphVertex*> GetSuccessorsMid(GraphVertex* vertex, GraphVertex* end);
     GraphVertex* GetMidVertex(GraphVertex* goal, int robot);
+    int MidHash(GraphVertex* vertex);
     double MidSearch(GraphVertex* goal, int robot);
 
     vector<GraphVertex*> GetSuccessorsLow(GraphVertex* vertex);
+    int LowHash(GraphVertex* vertex);
     double LowSearch(GraphVertex* start, GraphVertex* goal, int robot);
 
     int m_numWayPts;
@@ -28,6 +32,10 @@ public:
     vector<pair<int,int>> m_wayPts;
     vector<pair<int,int>> m_starts;
     vector<pair<int,int>> m_goals;
+
+    int m_mapXsize;
+    int m_mapYsize;
+    double* m_costmap;
 
 };
 

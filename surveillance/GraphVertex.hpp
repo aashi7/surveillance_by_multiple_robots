@@ -14,6 +14,7 @@ public:
     GraphVertex(vector<int> perWayPtRobots, int lastWayPt, 
                 vector<double> perRobotCosts, GraphVertex* parent);
     GraphVertex(vector<bool> wayPtsDone, int lastWayPt);
+    GraphVertex(pair<int,int> indices, int xsz, int ysz);
     ~GraphVertex();
 
     void SetFValue(double gVal, double hVal);
@@ -29,6 +30,11 @@ public:
     // Vertex for mid level graph - one mid graph per robot
     vector<bool> m_WayPtVisitation;        /*  M vector:   which waypoints have been visited?      */
     int m_lastVisited;                     /*  int id:     which waypoint was visited last?        */
+
+
+    // Vertex for low level graph
+    int m_X; int m_Y;                       /*  x and y index into grid                             */
+    int m_Xsz; int m_Ysz;                   /*  map size                                            */
 
 
     GraphVertex* m_parent;                 /*  vertex parent   */
