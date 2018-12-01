@@ -26,10 +26,11 @@ public:
     vector<double> m_WayPtAssignmentCosts; /*  N vector:   cost of assigning waypts to each robot  */
 
 
-
     // Vertex for mid level graph - one mid graph per robot
     vector<bool> m_WayPtVisitation;        /*  M vector:   which waypoints have been visited?      */
     int m_lastVisited;                     /*  int id:     which waypoint was visited last?        */
+    GraphVertex* m_lowPtr;                 /*  pointer:    to low search goal (which corresponds
+                                                           to edge from parent)                    */
 
 
     // Vertex for low level graph

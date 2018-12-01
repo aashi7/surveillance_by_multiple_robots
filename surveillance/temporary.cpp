@@ -60,7 +60,7 @@ int main()
 //4th is matrix of robot goals (2xnumRobots)
 //5th is matrix of waypoint locations (2xnumWayPts)
 //plhs should contain output parameters (2): 
-//1st is a 2D matrix plan when each plan[i] is the 2D position of robot at ith step of the plan
+//1st is a 3D matrix plan when each plan[i][j] is the 2D position of robot i at jth step of the plan
 //2nd is planlength (int)
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray*prhs[])

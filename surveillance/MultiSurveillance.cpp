@@ -39,16 +39,35 @@ MultiSurveillance::MultiSurveillance(int M, int N, vector<pair<int,int>> wayPts,
 MultiSurveillance::~MultiSurveillance(){}
 
 
-
 /* *************************** */
 /* TOP LEVEL SEARCH FUNCTIONS */
 /* ************************* */
 
 
+double MultiSurveillance::SearchCost(GraphVertex* reachedGoal)
+{
+    return ( (reachedGoal == NULL) ? D_INF : (reachedGoal->m_gValue) );
+}
+
 int MultiSurveillance::TopHash(GraphVertex* vertex)
 {
     vector<int> vec = vertex->m_WayPtAssignment;
     return boost::hash_range(vec.begin(), vec.end());
+}
+
+void MultiSurveillance::TopInitOpen(GraphVertex* current, unordered_map<int, GraphVertex*>* vertices, 
+    priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority>* open)
+{
+    current = new GraphVertex(vector<int>(m_numWayPts,0), 0,
+                           vector<double>(m_numRobots,0), NULL);
+    current->SetFValue(0,0);
+    (*vertices)[TopHash(current)] = current;
+    (*open).push(current);
+}
+
+bool MultiSurveillance::IsTopGoal(GraphVertex* vertex)
+{
+    return (vertex->m_lastAssigned == m_numWayPts);
 }
 
 vector<GraphVertex*> MultiSurveillance::TopSuccessors(GraphVertex* vertex)
@@ -63,7 +82,7 @@ vector<GraphVertex*> MultiSurveillance::TopSuccessors(GraphVertex* vertex)
             s = new GraphVertex(vertex->m_WayPtAssignment, nextAssign,
                 vertex->m_WayPtAssignmentCosts, vertex);
             s->m_WayPtAssignment[nextAssign-1] = i+1;
-            s->m_WayPtAssignmentCosts[i] = MidSearch(s,i+1);
+            s->m_WayPtAssignmentCosts[i] = SearchCost(MidSearch(s,i+1));
             succ.push_back(s);
         }
     }
@@ -84,7 +103,7 @@ double MultiSurveillance::TopPathCost(GraphVertex* current, GraphVertex* success
             if(find(successor->m_WayPtAssignment.begin(), 
                 successor->m_WayPtAssignment.end(), i+1)
                 == successor->m_WayPtAssignment.end())
-                gVal_s += MidSearch(successor,i+1);
+                gVal_s += SearchCost(MidSearch(successor,i+1));
     }
     return gVal_s;
 }
@@ -96,12 +115,8 @@ GraphVertex* MultiSurveillance::TopSearch()
     unordered_map<int, GraphVertex*> vertices;
 
     double gVal_s; int robot_s, hash_s;
-    vector<GraphVertex*> succ;
-    GraphVertex* curr = new GraphVertex(vector<int>(m_numWayPts,0), 0,
-                                   vector<double>(m_numRobots,0), NULL);
-    curr->SetFValue(0,0);
-    vertices[TopHash(curr)] = curr;
-    open.push(curr);
+    GraphVertex* curr; vector<GraphVertex*> succ;
+    TopInitOpen(curr, &vertices, &open);
     while(!open.empty())
     {
         while(closed[TopHash(open.top())]){open.pop();}
@@ -110,7 +125,7 @@ GraphVertex* MultiSurveillance::TopSearch()
 
         cout << "\nTop Current:" << *curr << '\n';
 
-        if(curr->m_lastAssigned == m_numWayPts){ return curr; }
+        if(IsTopGoal(curr)){ return curr; }
 
         succ = TopSuccessors(curr);
         for(GraphVertex* s: succ)
@@ -163,6 +178,22 @@ int MultiSurveillance::MidHash(GraphVertex* vertex)
     return num;
 }
 
+void MultiSurveillance::MidInitOpen(GraphVertex* current, unordered_map<int, GraphVertex*>* vertices, 
+    priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority>* open)
+{
+    current = new GraphVertex(vector<bool>(m_numWayPts,0), 0);
+    current->SetFValue(0,0);
+    current->m_parent = NULL;
+    (*vertices)[MidHash(current)] = current;
+    (*open).push(current);
+}
+
+bool MultiSurveillance::IsMidGoal(GraphVertex* vertex, GraphVertex* goal)
+{
+    return (vertex->m_WayPtVisitation == goal->m_WayPtVisitation &&
+            vertex->m_lastVisited == goal->m_lastVisited);
+}
+
 vector<GraphVertex*> MultiSurveillance::MidSuccessors(GraphVertex* vertex, GraphVertex* end)
 {
     vector<GraphVertex*> succ; GraphVertex* s;
@@ -182,12 +213,13 @@ vector<GraphVertex*> MultiSurveillance::MidSuccessors(GraphVertex* vertex, Graph
     return succ;
 }
 
-double MultiSurveillance::MidPathCost(GraphVertex* current, GraphVertex* successor, int robot)
+pair<double,GraphVertex*> MultiSurveillance::MidPath(GraphVertex* current, GraphVertex* successor, int robot)
 {
-    return (current->m_gValue + LowSearch(current, successor, robot));
+    GraphVertex* lowSearch = LowSearch(current, successor, robot);
+    return pair<double,GraphVertex*>((current->m_gValue + SearchCost(lowSearch)), lowSearch);
 }
 
-double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
+GraphVertex* MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
 {
     GraphVertex* end = MidVertex(goal,robot);
     cout << "\nMid Goal:" << *end << '\n';
@@ -197,11 +229,8 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
     unordered_map<int, GraphVertex*> vertices;
 
     double gVal_s; int hash_s;
-    vector<GraphVertex*> succ;
-    GraphVertex* curr = new GraphVertex(vector<bool>(m_numWayPts,0), 0);
-    curr->SetFValue(0,0);
-    vertices[MidHash(curr)] = curr;
-    open.push(curr);
+    GraphVertex *curr, *lowSearch; vector<GraphVertex*> succ;
+    MidInitOpen(curr, &vertices, &open);
     while(!open.empty())
     {
         while(closed[MidHash(open.top())]){ open.pop();}
@@ -210,8 +239,7 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
 
         cout << "\nMid Current:" << *curr << '\n';
 
-        if(curr->m_WayPtVisitation == end->m_WayPtVisitation &&
-            curr->m_lastVisited == end->m_lastVisited){ return curr->m_gValue; }
+        if(IsMidGoal(curr,end)){ return curr; }
 
         succ = MidSuccessors(curr,end);
         for(GraphVertex* s: succ)
@@ -219,7 +247,7 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
             hash_s = MidHash(s);
             if(!closed[hash_s])
             {
-                gVal_s = MidPathCost(curr, s, robot);
+                tie(gVal_s, lowSearch) = MidPath(curr, s, robot);
                 s->SetFValue(gVal_s,0);
 
                 if(vertices[hash_s] == NULL) { vertices[hash_s] = s; }
@@ -229,6 +257,7 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
                 {
                     s->SetFValue(gVal_s,0);
                     s->m_parent = vertices[MidHash(curr)];
+                    s->m_lowPtr = lowSearch;
                     open.push(s);
                 }
                 cout << "\nMid Successor:" << *s << '\n';
@@ -236,7 +265,7 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
         }
     }
     
-    return D_INF;
+    return NULL;
 }
 
 
@@ -247,6 +276,21 @@ double MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
 int MultiSurveillance::LowHash(GraphVertex* vertex)
 {
     return ((vertex->m_Y)*(vertex->m_Xsz) + (vertex->m_X));
+}
+
+void MultiSurveillance::LowInitOpen(pair<int,int> start, GraphVertex* current, unordered_map<int, GraphVertex*>* vertices, 
+    priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority>* open)
+{
+    current = new GraphVertex(start, m_mapXsize, m_mapYsize);
+    current->SetFValue(0,0);
+    current->m_parent = NULL;
+    (*vertices)[LowHash(current)] = current;
+    (*open).push(current);
+}
+
+bool MultiSurveillance::IsLowGoal(GraphVertex* vertex, pair<int,int> goal)
+{
+    return (vertex->m_X == goal.first && vertex->m_Y == goal.second);
 }
 
 vector<GraphVertex*> MultiSurveillance::LowSuccessors(GraphVertex* vertex)
@@ -276,35 +320,33 @@ double MultiSurveillance::LowPathCost(GraphVertex* current, GraphVertex* success
     return (current->m_gValue + m_costmap[LowHash(current)]);
 }
 
-double MultiSurveillance::LowSearch(GraphVertex* start, GraphVertex* goal, int robot)
+GraphVertex* MultiSurveillance::LowSearch(GraphVertex* start, GraphVertex* goal, int robot)
 {
     pair<int,int> s, g;
     s = (start->m_lastVisited == 0) ? m_starts[robot-1] : m_wayPts[start->m_lastVisited-1];
     g = (goal->m_lastVisited == m_numWayPts+1) ? m_goals[robot-1] : m_wayPts[goal->m_lastVisited-1];
 
-    /*   1-indexed from matlab. 0-indexing required for c++  */
+    // 1-indexed from matlab => 0-indexing (required for c++)
     s.first = s.first - 1; s.second = s.second - 1; g.first = g.first - 1; g.second = g.second - 1;
 
     // double eucDist = sqrt(pow(s.first-g.first,2) + pow(s.second-g.second,2));
-    // return eucDist;
+    // GraphVertex* reachedGoal = new GraphVertex(); reachedGoal->SetFValue(eucDist,0);
+    // return reachedGoal;
 
     priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority> open;
     unordered_map<int, bool> closed;
     unordered_map<int, GraphVertex*> vertices;
 
     double gVal_s; int hash_s;
-    vector<GraphVertex*> succ;
-    GraphVertex* curr = new GraphVertex(s, m_mapXsize, m_mapYsize);
-    curr->SetFValue(0,0);
-    vertices[LowHash(curr)] = curr;
-    open.push(curr);
+    GraphVertex* curr; vector<GraphVertex*> succ;
+    LowInitOpen(s, curr, &vertices, &open);
     while(!open.empty())
     {
         while(closed[LowHash(open.top())]){ open.pop();}
         curr = open.top(); open.pop();
         closed[LowHash(curr)] = 1;
 
-        if(curr->m_X == g.first && curr->m_Y == g.second){ return curr->m_gValue; }
+        if(IsLowGoal(curr,g)){ return curr; }
 
         succ = LowSuccessors(curr);
         for(GraphVertex* s: succ)
@@ -328,5 +370,55 @@ double MultiSurveillance::LowSearch(GraphVertex* start, GraphVertex* goal, int r
         }
     }
     
-    return D_INF;
+    return NULL;
+}
+
+vector<pair<int,int>> MultiSurveillance::BackTrackLowPlan(GraphVertex* midSearchPtr)
+{
+    if(midSearchPtr == NULL){ return vector<pair<int,int>>();}
+    vector<pair<int,int>> backPath;
+    GraphVertex* lowSearchPtr = midSearchPtr->m_lowPtr;
+    while(lowSearchPtr != NULL)
+    {
+        backPath.push_back(pair<int,int>(lowSearchPtr->m_X,lowSearchPtr->m_Y));
+        lowSearchPtr = lowSearchPtr->m_parent;
+    }
+
+    return backPath;
+}
+
+pair<double***,vector<int>> MultiSurveillance::RunPlan()
+{
+    vector<vector<pair<int,int>>> finalPlan(m_numRobots);
+    vector<pair<int,int>> robotLowPlan, robotPartPlan;
+    vector<int> finalPlanLengths(m_numRobots,0);
+    GraphVertex *midSearchPtr, *topSearchPtr = TopSearch();
+    for(int i = 0 ; i < m_numRobots; i++)
+    {
+        robotLowPlan = vector<pair<int,int>>();
+        midSearchPtr = MidSearch(topSearchPtr,i+1);
+        while(midSearchPtr != NULL)
+        {
+            robotPartPlan = BackTrackLowPlan(midSearchPtr);
+            robotLowPlan.insert(robotLowPlan.end(), robotPartPlan.begin(), robotPartPlan.end());
+            midSearchPtr = midSearchPtr->m_parent;
+        }
+        reverse(robotLowPlan.begin(), robotLowPlan.end());
+        finalPlan[i] = robotLowPlan;
+        finalPlanLengths[i] = finalPlan[i].size();
+    }
+
+    double*** finalPlanPtr = (double***) malloc(m_numRobots*sizeof(double**));
+    for(int i = 0; i < m_numRobots; i++)
+    {
+        finalPlanPtr[i] = (double**) malloc(finalPlanLengths[i]*sizeof(double*));
+        for(int j = 0; j < finalPlanLengths[i]; j++)
+        {
+            finalPlanPtr[i][j] = (double*) malloc(2*sizeof(double));
+            finalPlanPtr[i][j][0] = finalPlan[i][j].first;
+            finalPlanPtr[i][j][1] = finalPlan[i][j].second;
+        }
+    }
+
+    return(pair<double***,vector<int>>(finalPlanPtr,finalPlanLengths));
 }

@@ -1,3 +1,6 @@
+#ifndef COMPAREPRIORITY_CPP
+#define COMPAREPRIORITY_CPP
+
 #include "GraphVertex.hpp"
 
 using namespace std;
@@ -13,3 +16,5 @@ public:
     bool operator () (GraphVertex* a, GraphVertex* b) const {
         return (a->m_fValue > b->m_fValue);}
 };
+
+#endif
