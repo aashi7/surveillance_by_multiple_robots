@@ -160,6 +160,7 @@ vector<GraphVertex*> MultiSurveillance::TopSearch()
     }
 
     //cout << "TopSearch: " << goal_expanded << endl;
+    int robot_id; 
     if (goal_expanded)
     {
         TopPath.push_back(goalNode);
@@ -173,26 +174,74 @@ vector<GraphVertex*> MultiSurveillance::TopSearch()
         reverse(TopPath.begin(), TopPath.end());
 
         /// Before returning the path let's print
+
+        /// 3D vector: NumRobots x pathlen x 2 
+        vector<vector<pair<int,int>>> paths_of_all_robots(m_numRobots); // size equal to NumRobots : for index access 
+
         vector<GraphVertex*> printPath;
         printPath = TopPath;  
-        for (int i = 0; i < printPath.size(); i++)
+        // for (int i = 0; i < printPath.size(); i++)
+        // {
+        //     GraphVertex* topVertex = printPath[i];
+        //     cout << "Top Vertex: " << *topVertex << endl;
+        //     vector<GraphVertex*> MidPath = topVertex->m_mid_level_path;      
+        //     for (int m = 0; m < MidPath.size(); m++)
+        //     {
+        //         // Middle level path corresponds to which agent (Have to know)
+        //         GraphVertex* midVertex = MidPath[m];
+        //         cout << "Mid Vertex: " << *midVertex << endl;
+        //         vector<GraphVertex*> LowPath = midVertex->m_low_level_path;
+        //         cout << "Size of Low Path: " << LowPath.size() << endl;
+        //         if (LowPath.size() > 0) // have to know which robot's low level path
+        //         {
+        //             //cout << *midVertex << endl; 
+        //             //cout <<  "last assigned of middle vertex: " << midVertex->m_lastVisited << endl; // lastVisited could be 3 
+        //             robot_id = topVertex->m_WayPtAssignment[topVertex->m_lastAssigned-1];  // This should be the desired robot id 
+        //             //cout << robot_id << endl;
+        //         } 
+        //         for (int l = 0; l < LowPath.size(); l++)           
+        //         {
+        //             GraphVertex* lowVertex = LowPath[l];
+        //             cout << "Low Vertex: " <<  *lowVertex << endl;
+        //             paths_of_all_robots[robot_id-1].push_back({lowVertex->m_X, lowVertex->m_Y}); // pair of (x,y) pushed to the path of corresponding robot 
+        //         }
+        //     }
+        // }
+
+
+        // Extract Oprimal allocation 
+        GraphVertex* optimal_allocation = printPath.back();
+
+        // print optimal allocation 
+        //cout << *optimal_allocation << endl;
+
+        // Generate paths again and print 
+        for (int r = 0; r < m_numRobots; r++)
         {
-            GraphVertex* topVertex = printPath[i];
-            cout << "Top Vertex: " << *topVertex << endl;
-            vector<GraphVertex*> MidPath = topVertex->m_mid_level_path;
-            for (int m = 0; m < MidPath.size(); m++)
+            vector<GraphVertex*> robot_mid_path = MidSearch(optimal_allocation, r+1);
+            for (int m = 0; m < robot_mid_path.size(); m++)
             {
-                GraphVertex* midVertex = MidPath[m];
-                cout << "Mid Vertex: " << *midVertex << endl;
+                GraphVertex* midVertex = robot_mid_path[m];
                 vector<GraphVertex*> LowPath = midVertex->m_low_level_path;
-                cout << "Size of Low Path: " << LowPath.size() << endl;
-                for (int l = 0; l < LowPath.size(); l++)
+                for (int l = 0; l < LowPath.size(); l++)           
                 {
                     GraphVertex* lowVertex = LowPath[l];
-                    cout << "Low Vertex: " <<  *lowVertex << endl;
-                }
+                    //cout << "Low Vertex: " <<  *lowVertex << endl;
+                    paths_of_all_robots[r].push_back({lowVertex->m_X, lowVertex->m_Y}); // pair of (x,y) pushed to the path of corresponding robot 
+                }            
             }
         }
+
+
+        for (int r = 0; r < m_numRobots; r++)
+        {
+            cout << r << endl;
+            for (int j = 0; j < paths_of_all_robots[r].size(); j++)
+            {
+                cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
+            }
+        }
+
 
         return TopPath;
     }
