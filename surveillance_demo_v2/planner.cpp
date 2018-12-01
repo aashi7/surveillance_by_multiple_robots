@@ -45,7 +45,7 @@ int main()
 
 	MultiSurveillance *MS = new MultiSurveillance(M, N, wayPts, starts, goals, map, xsz, ysz);
 	// cout << "search done" << endl;
-	cout << (MS->TopSearch())->m_gValue << " Path cost" << endl;
+	cout << (MS->TopSearch()).back()->m_gValue << " Path cost" << endl;
 
 
 	return 0;

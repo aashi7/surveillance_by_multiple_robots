@@ -17,7 +17,7 @@ using namespace std;
 
 using namespace std;
 
-void planner(vector<vector<int>>& input_map, double*** plan)
+void planner(vector<vector<int>>& map, double*** plan)
 {
 
 	vector<pair<int,int>> starts, goals, wayPts;
@@ -49,7 +49,7 @@ void planner(vector<vector<int>>& input_map, double*** plan)
 	// 	{0,0,0,0,0,0,0,0}
 	// };
 
-	vector<vector<int>> map(8, vector<int>(8,0)); // 8 x 8 with zeros 
+	//vector<vector<int>> map(8, vector<int>(8,0)); // 8 x 8 with zeros 
 
 	MultiSurveillance *MS = new MultiSurveillance(M, N, wayPts, starts, goals, map, xsz, ysz);
 	// cout << "search done" << endl;

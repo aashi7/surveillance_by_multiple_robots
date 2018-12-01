@@ -17,16 +17,16 @@ class MultiSurveillance
 
 		double TopPathCost(GraphVertex* current, GraphVertex* successor);
 		int TopHash(GraphVertex* vertex);
-		GraphVertex* TopSearch();
+		vector<GraphVertex*> TopSearch();
 
 		vector<GraphVertex*> GetSuccessorsMid(GraphVertex* vertex, GraphVertex* end);
 		GraphVertex* GetMidVertex(GraphVertex* goal, int robot);
 		int MidHash(GraphVertex* vertex);
-		double MidSearch(GraphVertex* goal, int robot);
+		vector<GraphVertex*> MidSearch(GraphVertex* goal, int robot);
 
 		vector<GraphVertex*> GetSuccessorsLow(GraphVertex* vertex);
 		int LowHash(GraphVertex* vertex);
-		double LowSearch(GraphVertex* start, GraphVertex* goal, int robot);
+		vector<GraphVertex*> LowSearch(GraphVertex* start, GraphVertex* goal, int robot);
 
 		int m_numWayPts;
 		int m_numRobots;

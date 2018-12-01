@@ -10,18 +10,20 @@ using namespace std;
 GraphVertex::GraphVertex(){}
 
 GraphVertex::GraphVertex(vector<int> perWayPtRobots, int lastWayPt, vector<double> perRobotCosts, 
-	GraphVertex* parent)
+	GraphVertex* parent, vector<GraphVertex*> mid_level_path)
 {
 	m_WayPtAssignment = perWayPtRobots;
 	m_lastAssigned = lastWayPt;
 	m_WayPtAssignmentCosts = perRobotCosts;
 	m_parent = parent;
+	m_mid_level_path = mid_level_path;
 }
 
-GraphVertex::GraphVertex(vector<bool> wayPtsDone, int lastWayPt)
+GraphVertex::GraphVertex(vector<bool> wayPtsDone, int lastWayPt, vector<GraphVertex*> low_level_path)
 {
 	m_WayPtVisitation = wayPtsDone;
 	m_lastVisited = lastWayPt;
+	m_low_level_path = low_level_path;
 }
 
 GraphVertex::GraphVertex(pair<int, int> indices, int xsz, int ysz)
@@ -54,12 +56,18 @@ ostream& operator<<(ostream& os, const GraphVertex& vertex)
 		os << "\nLast Way Point Assigned: " << vertex.m_lastAssigned;
 	}
 
-	if ((vertex.m_WayPtVisitation).size() > 0) // indicates it's a mid level node 
+	else if ((vertex.m_WayPtVisitation).size() > 0) // indicates it's a mid level node 
 	{
 		os << "\nWay Points Visited: ";
 		for (auto i: vertex.m_WayPtVisitation)
 			os << i << " ";
 		os << "\nLast Way Point Visited: " << vertex.m_lastVisited;
+	}
+
+	else
+	{
+		os << "\nGrid coordinates:\n";
+		os << "x: " << vertex.m_X << " y: " << vertex.m_Y;
 	}
 
 	os << "\nG-Value: " << vertex.m_gValue; 
