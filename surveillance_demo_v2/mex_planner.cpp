@@ -17,7 +17,8 @@ using namespace std;
 
 using namespace std;
 
-void planner(vector<vector<int>>& map, double*** plan)
+//void planner(vector<vector<int>>& map, double*** plan)
+void planner(vector<vector<int>>& map, vector<vector<pair<int,int>>>& plan)
 {
 
 	vector<pair<int,int>> starts, goals, wayPts;
@@ -53,8 +54,22 @@ void planner(vector<vector<int>>& map, double*** plan)
 
 	MultiSurveillance *MS = new MultiSurveillance(M, N, wayPts, starts, goals, map, xsz, ysz);
 	// cout << "search done" << endl;
-	cout << (MS->TopSearch())->m_gValue << " Path cost" << endl;
-	*plan = NULL;
+	// cout << (MS->TopSearch())->m_gValue << " Path cost" << endl;
+
+	vector<vector<pair<int,int>>> paths_of_all_robots = MS->TopSearch();
+
+	    for (int r = 0; r < N; r++)
+        {
+            cout << r << endl;
+            for (int j = 0; j < paths_of_all_robots[r].size(); j++)
+            {
+                cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
+            }
+        }
+
+    // To return the path in MATLAB array 
+	//*plan = paths_of_all_robots[0]; // returning the path of one robot 
+	plan = paths_of_all_robots;
 	return;
 }
 
@@ -86,37 +101,41 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 	}
 
-	int planlength = 0; // To assign dimensions to output matrix 
-	double** plan = NULL;
+	
+	//double** plan = NULL;
+	vector<vector<pair<int,int>>> plan; 
 	// now call the function here 
-	planner(map, &plan);
+	planner(map, plan);
 
-	int numofDOFs = 2; // in x and in y 
-	if (planlength > 0)
+	for (int r = 0; r < plan.size()-1; r++)
 	{
-		PLAN_OUT = mxCreateNumericMatrix((mwSize)planlength, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
-		double* plan_out = mxGetPr(PLAN_OUT);
-		// copy the values 
-		int i,j;
-		for (i = 0; i < planlength; i++)
+		int planlength = plan[r].size(); // To assign dimensions to output matrix 
+		int numofDOFs = 2; // in x and in y 
+		if (planlength > 0)
 		{
-			for (j = 0; j < numofDOFs; j++)
+			PLAN_OUT = mxCreateNumericMatrix((mwSize)planlength, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
+			double* plan_out = mxGetPr(PLAN_OUT);
+			// copy the values 
+			int i,j;
+			for (i = 0; i < planlength; i++)
 			{
-				plan_out[j*planlength + i] = plan[i][j];
+					plan_out[j*planlength + i] = plan[r][i].first;
+					plan_out[planlength + i] = plan[r][i].second;
 			}
 		}
-	}
-	else
-	{
-		PLAN_OUT = mxCreateNumericMatrix((mwSize)1, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
-		double* plan_out = mxGetPr(PLAN_OUT);
-		int j;
-		for (j = 0; j < numofDOFs; j++)
+		else
 		{
-			plan_out[j] = 0;
+			PLAN_OUT = mxCreateNumericMatrix((mwSize)1, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
+			double* plan_out = mxGetPr(PLAN_OUT);
+			int j;
+			for (j = 0; j < numofDOFs; j++)
+			{
+				plan_out[j] = 0;
+			}
 		}
-	}
 
+	}
 	return;
 }
+
 

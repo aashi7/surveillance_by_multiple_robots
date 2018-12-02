@@ -95,8 +95,13 @@ double MultiSurveillance::TopPathCost(GraphVertex* current, GraphVertex* success
     return gVal_s;
 }
 
-vector<GraphVertex*> MultiSurveillance::TopSearch()
+// Return paths_of_all_robots to MATLAB  
+vector<vector<pair<int, int>>> MultiSurveillance::TopSearch()
 {
+
+    /// 3D vector: NumRobots x pathlen x 2 
+    vector<vector<pair<int,int>>> paths_of_all_robots(m_numRobots); // size equal to NumRobots : for index access 
+
     priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority> open;
     unordered_map<int, bool> closed;
     unordered_map<int, GraphVertex*> vertices;
@@ -175,9 +180,6 @@ vector<GraphVertex*> MultiSurveillance::TopSearch()
 
         /// Before returning the path let's print
 
-        /// 3D vector: NumRobots x pathlen x 2 
-        vector<vector<pair<int,int>>> paths_of_all_robots(m_numRobots); // size equal to NumRobots : for index access 
-
         vector<GraphVertex*> printPath;
         printPath = TopPath;  
         // for (int i = 0; i < printPath.size(); i++)
@@ -233,20 +235,20 @@ vector<GraphVertex*> MultiSurveillance::TopSearch()
         }
 
 
-        for (int r = 0; r < m_numRobots; r++)
-        {
-            cout << r << endl;
-            for (int j = 0; j < paths_of_all_robots[r].size(); j++)
-            {
-                cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
-            }
-        }
+        // for (int r = 0; r < m_numRobots; r++)
+        // {
+        //     cout << r << endl;
+        //     for (int j = 0; j < paths_of_all_robots[r].size(); j++)
+        //     {
+        //         cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
+        //     }
+        // }
 
 
-        return TopPath;
+        //return paths_of_all_robots;
     }
 
-    return TopPath;
+    return paths_of_all_robots;
 }
 
 
