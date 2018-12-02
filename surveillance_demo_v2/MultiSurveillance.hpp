@@ -17,7 +17,7 @@ class MultiSurveillance
 
 		double TopPathCost(GraphVertex* current, GraphVertex* successor);
 		int TopHash(GraphVertex* vertex);
-		vector<GraphVertex*> TopSearch();
+		vector<vector<pair<int,int>>> TopSearch();
 
 		vector<GraphVertex*> GetSuccessorsMid(GraphVertex* vertex, GraphVertex* end);
 		GraphVertex* GetMidVertex(GraphVertex* goal, int robot);

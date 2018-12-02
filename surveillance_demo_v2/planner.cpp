@@ -45,7 +45,17 @@ int main()
 
 	MultiSurveillance *MS = new MultiSurveillance(M, N, wayPts, starts, goals, map, xsz, ysz);
 	// cout << "search done" << endl;
-	cout << (MS->TopSearch()).back()->m_gValue << " Path cost" << endl;
+	// cout << (MS->TopSearch()).back()->m_gValue << " Path cost" << endl;
+	vector<vector<pair<int,int>>> paths_of_all_robots = MS->TopSearch();
+
+        for (int r = 0; r < N; r++)
+        {
+            cout << r << endl;
+            for (int j = 0; j < paths_of_all_robots[r].size(); j++)
+            {
+                cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
+            }
+        }
 
 
 	return 0;
