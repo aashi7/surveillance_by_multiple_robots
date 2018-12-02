@@ -437,11 +437,13 @@ vector<GraphVertex*> MultiSurveillance::LowSearch(GraphVertex* start, GraphVerte
 
         succ = GetSuccessorsLow(curr);
 
-        gVal_s = curr->m_gValue + 1; // move in a 8-connected grid
+        //gVal_s = curr->m_gValue + 1; // move in a 8-connected grid
 
         //gVal_s = curr->m_gValue + m_costmap[LowHash(curr)]; // Infinite cost for blocked cells    if (m_costmap[LowHash(curr)] == 1) but m_costmap would be a 2D matrix - isn't it? Does linear indexing work?
         for(GraphVertex* s: succ)
         {
+            double cost =  sqrt(pow(s->m_X - curr->m_X,2) + pow(s->m_Y - curr->m_Y,2));
+            gVal_s = curr->m_gValue + cost;
             hash_s = LowHash(s);
             if(!closed[hash_s])
             {

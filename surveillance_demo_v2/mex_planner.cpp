@@ -102,6 +102,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 	}
 
+	// Read robot start positions, goal positions and waypoint position from MATLAB too 
+
 	
 	//double** plan = NULL;
 	vector<vector<pair<int,int>>> plan; 
