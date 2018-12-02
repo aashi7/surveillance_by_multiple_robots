@@ -1,4 +1,5 @@
 #include "mex.h"
+#include "matrix.h" // mwSize, mwIndex 
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -13,7 +14,7 @@
 using namespace std;
 
 #define MAP_IN prhs[0]
-#define PLAN_OUT plhs[0]
+#define PLAN_OUT plhs[0]  // 3-dim double array OUT 
 
 using namespace std;
 
@@ -107,34 +108,64 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// now call the function here 
 	planner(map, plan);
 
-	for (int r = 0; r < plan.size()-1; r++)
+	int max_plan_length = 0;
+	for (int r = 0; r < plan.size(); r++)
 	{
-		int planlength = plan[r].size(); // To assign dimensions to output matrix 
-		int numofDOFs = 2; // in x and in y 
-		if (planlength > 0)
-		{
-			PLAN_OUT = mxCreateNumericMatrix((mwSize)planlength, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
-			double* plan_out = mxGetPr(PLAN_OUT);
-			// copy the values 
-			int i,j;
-			for (i = 0; i < planlength; i++)
-			{
-					plan_out[j*planlength + i] = plan[r][i].first;
-					plan_out[planlength + i] = plan[r][i].second;
-			}
-		}
-		else
-		{
-			PLAN_OUT = mxCreateNumericMatrix((mwSize)1, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
-			double* plan_out = mxGetPr(PLAN_OUT);
-			int j;
-			for (j = 0; j < numofDOFs; j++)
-			{
-				plan_out[j] = 0;
-			}
-		}
-
+		if (max_plan_length < plan[r].size())
+			max_plan_length  = plan[r].size();
 	}
+
+	int ndim = 3;
+	int N = plan.size();
+	int numofDOFs = 2;
+	const mwSize dims[3] = {(mwSize)numofDOFs, (mwSize)max_plan_length, (mwSize)N};
+
+	PLAN_OUT = mxCreateNumericArray((mwSize)ndim, dims, mxDOUBLE_CLASS, mxREAL);
+	double *plan_out;
+	plan_out = mxGetPr(PLAN_OUT);
+	// for (int r = 0; r < plan.size(); r++)
+	// {
+	// 	int planlength = plan[r].size(); // To assign dimensions to output matrix 
+	// 	int numofDOFs = 2; // in x and in y 
+	// 	if (planlength > 0)
+	// 	{
+	// 		//PLAN_OUT = mxCreateNumericMatrix((mwSize)planlength, (mwSize)numofDOFs, mxINT16_CLASS, mxREAL);
+	// 		PLAN_OUT = mxCreateNumericMatrix((mwSize)ndim, (mwSize)dims, mxDOUBLE_CLASS, mxREAL);
+	// 		double* plan_out = mxGetPr(PLAN_OUT);
+	// 		// copy the values 
+	// 		int i,j;
+	// 		for (i = 0; i < max_plan_length; i++)
+	// 		{
+	// 				plan_out[r*max_plan_length*2 + i*2 + 0] = plan[r][i].first;
+	// 				plan_out[r*max_plan_length*2 + i*2 + 1] = plan[r][i].second; // Memory error 
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		PLAN_OUT = mxCreateNumericMatrix((mwSize)1, (mwSize)numofDOFs, mxDOUBLE_CLASS, mxREAL);
+	// 		double* plan_out = mxGetPr(PLAN_OUT);
+	// 		int j;
+	// 		for (j = 0; j < numofDOFs; j++)
+	// 		{
+	// 			plan_out[j] = 0;
+	// 		}
+	// 	}
+
+	// }
+
+	int dim3, dim2;
+	for (dim3 = 0; dim3 < dims[2]; dim3++)
+	{
+		for (dim2 = 0; dim2 < dims[1]; dim2++)
+		{
+			if (dim2 < plan[dim3].size())
+			{
+				plan_out[(dim3) + (dim2)*(dims[2]) + 0*dims[2]*dims[1]] = plan[dim3][dim2].first;
+				plan_out[(dim3) + (dim2)*(dims[2]) + 1*dims[2]*dims[1]] = plan[dim3][dim2].second;
+			}
+		}
+	}
+
 	return;
 }
 
