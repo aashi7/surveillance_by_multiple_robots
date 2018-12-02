@@ -387,7 +387,7 @@ vector<pair<int,int>> MultiSurveillance::BackTrackLowPlan(GraphVertex* midSearch
     return backPath;
 }
 
-pair<double***,vector<int>> MultiSurveillance::RunPlan()
+pair<double***,int*> MultiSurveillance::RunPlan()
 {
     vector<vector<pair<int,int>>> finalPlan(m_numRobots);
     vector<pair<int,int>> robotLowPlan, robotPartPlan;
@@ -415,10 +415,14 @@ pair<double***,vector<int>> MultiSurveillance::RunPlan()
         for(int j = 0; j < finalPlanLengths[i]; j++)
         {
             finalPlanPtr[i][j] = (double*) malloc(2*sizeof(double));
-            finalPlanPtr[i][j][0] = finalPlan[i][j].first;
-            finalPlanPtr[i][j][1] = finalPlan[i][j].second;
+            finalPlanPtr[i][j][0] = (double) finalPlan[i][j].first;
+            finalPlanPtr[i][j][1] = (double) finalPlan[i][j].second;
         }
     }
 
-    return(pair<double***,vector<int>>(finalPlanPtr,finalPlanLengths));
+    int* finalPlanLengthsPtr = (int*) malloc(m_numRobots*sizeof(int));
+    for(int i = 0; i < m_numRobots; i++)
+        finalPlanLengthsPtr[i] = finalPlanLengths[i];
+
+    return(pair<double***,int*>(finalPlanPtr,finalPlanLengthsPtr));
 }
