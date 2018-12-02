@@ -21,6 +21,17 @@ using namespace std;
 
 using namespace std;
 
+///// Print a vector<pair<int,int>> ////////
+void printCoordinates(vector<pair<int,int>>& arr)
+{
+	int n = arr.size();
+	for (int i = 0; i < n; i++)
+	{
+		cout << arr[i].first << " " << arr[i].second << endl;
+	}
+	return; 
+}
+
 //void planner(vector<vector<int>>& map, double*** plan)
 void planner(vector<vector<int>>& map, vector<pair<int,int>>& wayPts,
 	vector<pair<int,int>>& starts, vector<pair<int,int>>& goals,
@@ -37,6 +48,15 @@ void planner(vector<vector<int>>& map, vector<pair<int,int>>& wayPts,
 
 	// wayPts.push_back({3,7});
 	// wayPts.push_back({7,7});
+
+	cout << "Waypoint Read: \n";
+	printCoordinates(wayPts);
+
+	cout << "Start Positions: \n";
+	printCoordinates(starts);
+
+	cout << "Goal Positions: \n";
+	printCoordinates(goals); 
 
 	int M = wayPts.size();
 	int N = starts.size();
@@ -112,7 +132,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Read robot start positions, goal positions and waypoint position from MATLAB too 
 	
 	////////// Waypoints ///////////////////////
-	int numWayPts = (int) mxGetM(WAYPOINT_IN);
+	int numWayPts = (int) mxGetN(WAYPOINT_IN);
 	vector<pair<int,int>> wayPts(numWayPts); 
 	double* waypoints = mxGetPr(WAYPOINT_IN);
 
@@ -126,7 +146,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 
 	////////// Robot Starts ////////////////
-	int numRobots = (int) mxGetM(ROBOTS_START);
+	int numRobots = (int) mxGetN(ROBOTS_START);
+	cout << numRobots << endl;
 	vector<pair<int,int>> starts(numRobots);
 	double* robotStarts = mxGetPr(ROBOTS_START);
 
@@ -146,9 +167,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	ptr = 0;
 	for (int i = 0; i < numRobots; i++)
 	{
-		goals[i].first = robotStarts[ptr] - 1; // from MATLAB indexing to C++ indexing 
+		goals[i].first = robotGoals[ptr] - 1; // from MATLAB indexing to C++ indexing 
 		ptr++;
-		goals[i].second = robotStarts[ptr] - 1;
+		goals[i].second = robotGoals[ptr] - 1;
 		ptr++;
 	}
 
