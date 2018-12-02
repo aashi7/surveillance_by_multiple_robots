@@ -2,8 +2,10 @@ function [plan] = demo()
 
 map = zeros(8,8);
 
-wayPts = [[4,8];[8,8]]; %% x-Positions of all waypoints in first row, y-Positions of all waypoints in second row
-starts = [[1,7];[1,2]]; %% x-Positions of all starts in first row, y-Positions of all waypoints in second row 
+%%%% add obstacles %%%%
+
+wayPts = [[4,8,1];[8,8,3]]; %% row-Positions of all waypoints in first row, col-Positions of all waypoints in second row
+starts = [[1,7];[1,2]]; %% row-Positions of all starts in first row, col-Positions of all waypoints in second row 
 goals = [[1,5];[1,5]]; 
 
 [plan] = mex_planner(map, wayPts, starts, goals);

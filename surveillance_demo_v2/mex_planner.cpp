@@ -84,14 +84,14 @@ void planner(vector<vector<int>>& map, vector<pair<int,int>>& wayPts,
 
 	vector<vector<pair<int,int>>> paths_of_all_robots = MS->TopSearch();
 
-	    for (int r = 0; r < N; r++)
-        {
-            cout << r << endl;
-            for (int j = 0; j < paths_of_all_robots[r].size(); j++)
-            {
-                cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
-            }
-        }
+	    // for (int r = 0; r < N; r++)
+     //    {
+     //        cout << r << endl;
+     //        for (int j = 0; j < paths_of_all_robots[r].size(); j++)
+     //        {
+     //            cout << paths_of_all_robots[r][j].first << " " << paths_of_all_robots[r][j].second << endl;
+     //        }
+     //    }
 
     // To return the path in MATLAB array 
 	//*plan = paths_of_all_robots[0]; // returning the path of one robot 
