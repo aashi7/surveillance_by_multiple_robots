@@ -14,30 +14,35 @@
 using namespace std;
 
 #define MAP_IN prhs[0]
+#define WAYPOINT_IN prhs[1]
+#define ROBOTS_START prhs[2]
+#define ROBOTS_GOAL prhs[3]
 #define PLAN_OUT plhs[0]  // 3-dim double array OUT 
 
 using namespace std;
 
 //void planner(vector<vector<int>>& map, double*** plan)
-void planner(vector<vector<int>>& map, vector<vector<pair<int,int>>>& plan)
+void planner(vector<vector<int>>& map, vector<pair<int,int>>& wayPts,
+	vector<pair<int,int>>& starts, vector<pair<int,int>>& goals,
+ vector<vector<pair<int,int>>>& plan)
 {
 
-	vector<pair<int,int>> starts, goals, wayPts;
+	// vector<pair<int,int>> starts, goals, wayPts;
 
-	starts.push_back({0,0});
-	starts.push_back({0,0});
+	// starts.push_back({0,0});
+	// starts.push_back({0,0});
 
-	goals.push_back({0,0});
-	goals.push_back({0,0});
+	// goals.push_back({0,0});
+	// goals.push_back({0,0});
 
-	wayPts.push_back({3,7});
-	wayPts.push_back({7,7});
+	// wayPts.push_back({3,7});
+	// wayPts.push_back({7,7});
 
 	int M = wayPts.size();
 	int N = starts.size();
 
-	int xsz = 8;
-	int ysz = 8;
+	int xsz = map[0].size();
+	int ysz = map.size();
 
 	// int map[8][8] = 
 	// {
@@ -77,7 +82,7 @@ void planner(vector<vector<int>>& map, vector<vector<pair<int,int>>>& plan)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	/* Check for proper number of arguments */
-	if (nrhs != 1) // as a first step, only map 
+	if (nrhs != 4) // as a first step, only map 
 	{
 		mexErrMsgIdAndTxt("MATLAB:planner:invalidNumInputs", "Map is required.");
 	}
@@ -102,13 +107,55 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 	}
 
-	// Read robot start positions, goal positions and waypoint position from MATLAB too 
+	int numofDOFs = 2;
 
+	// Read robot start positions, goal positions and waypoint position from MATLAB too 
 	
+	////////// Waypoints ///////////////////////
+	int numWayPts = (int) mxGetM(WAYPOINT_IN);
+	vector<pair<int,int>> wayPts(numWayPts); 
+	double* waypoints = mxGetPr(WAYPOINT_IN);
+
+	ptr = 0;
+	for (int i = 0; i < numWayPts; i++)
+	{
+		wayPts[i].first = waypoints[ptr] - 1; // from MATLAB indexing to C++ indexing 
+		ptr++;
+		wayPts[i].second = waypoints[ptr] - 1; 
+		ptr++;
+	}
+
+	////////// Robot Starts ////////////////
+	int numRobots = (int) mxGetM(ROBOTS_START);
+	vector<pair<int,int>> starts(numRobots);
+	double* robotStarts = mxGetPr(ROBOTS_START);
+
+	ptr = 0;
+	for (int i = 0; i < numRobots; i++)
+	{
+		starts[i].first = robotStarts[ptr] - 1; // from MATLAB indexing to C++ indexing 
+		ptr++;
+		starts[i].second = robotStarts[ptr] - 1;
+		ptr++;
+	}
+	
+	/////////// Robot Goals /////////////
+	vector<pair<int,int>> goals(numRobots);
+	double* robotGoals = mxGetPr(ROBOTS_GOAL);
+
+	ptr = 0;
+	for (int i = 0; i < numRobots; i++)
+	{
+		goals[i].first = robotStarts[ptr] - 1; // from MATLAB indexing to C++ indexing 
+		ptr++;
+		goals[i].second = robotStarts[ptr] - 1;
+		ptr++;
+	}
+
 	//double** plan = NULL;
 	vector<vector<pair<int,int>>> plan; 
 	// now call the function here 
-	planner(map, plan);
+	planner(map, wayPts, starts, goals, plan);
 
 	int max_plan_length = 0;
 	for (int r = 0; r < plan.size(); r++)
@@ -119,7 +166,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	int ndim = 3;
 	int N = plan.size();
-	int numofDOFs = 2;
+
 	const mwSize dims[3] = {(mwSize)numofDOFs, (mwSize)max_plan_length, (mwSize)N};
 
 	PLAN_OUT = mxCreateNumericArray((mwSize)ndim, dims, mxDOUBLE_CLASS, mxREAL);

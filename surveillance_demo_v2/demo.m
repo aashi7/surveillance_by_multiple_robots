@@ -6,7 +6,7 @@ wayPts = [[4,8];[8,8]];
 starts = [[1,1];[1,1]];
 goals = [[1,1];[1,1]];
 
-[plan] = mex_planner(map);
+[plan] = mex_planner(map, wayPts, starts, goals);
 [NumRobots, MaxPathLength, numofDOFs] = size(plan);
 
 figure
@@ -21,7 +21,7 @@ for i=1:size(starts,1)
 end
 
 for w=1:size(wayPts,1)
-    plot(wayPts(w,1), wayPts(w,2), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 20);
+    plot(wayPts(w,1), wayPts(w,2), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
 end
 %legend(h,'Robot Start', 'Waypoint');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
