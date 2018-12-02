@@ -3,8 +3,8 @@ function [plan] = demo()
 map = zeros(8,8);
 
 wayPts = [[4,8];[8,8]]; %% x-Positions of all waypoints in first row, y-Positions of all waypoints in second row
-starts = [[1,7,1];[1,2,1]]; %% x-Positions of all starts in first row, y-Positions of all waypoints in second row 
-goals = [[1,5,1];[1,5,1]]; 
+starts = [[1,7];[1,2]]; %% x-Positions of all starts in first row, y-Positions of all waypoints in second row 
+goals = [[1,5];[1,5]]; 
 
 [plan] = mex_planner(map, wayPts, starts, goals);
 [NumRobots, MaxPathLength, numofDOFs] = size(plan);
@@ -16,16 +16,16 @@ hold on
 % h = zeros(2,1);
 % h(1) = plot(starts(1,1),starts(1,2),'o');
 % h(2) = plot(wayPts(1,1),wayPts(1,2),'h');
-for i=1:size(starts,1)
-    plot(starts(i,2), starts(i,1), 'o','MarkerFaceColor',[0,0,1] ,'MarkerSize', 15);
+for i=1:size(starts,2)
+    plot(starts(2,i), starts(1,i), 'o','MarkerFaceColor',[0,0,1] ,'MarkerSize', 15);
 end
 
-for i=1:size(goals,1)
-    plot(goals(i,2), goals(i,1), 'o','MarkerFaceColor',[0,1,0] ,'MarkerSize', 15);
+for i=1:size(goals,2)
+    plot(goals(2,i), goals(1,i), 'o','MarkerFaceColor',[0,1,0] ,'MarkerSize', 15);
 end
 
-for w=1:size(wayPts,1)
-    plot(wayPts(w,2), wayPts(w,1), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
+for w=1:size(wayPts,2)
+    plot(wayPts(2,w), wayPts(1,w), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
 end
 %legend(h,'Robot Start', 'Waypoint');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
