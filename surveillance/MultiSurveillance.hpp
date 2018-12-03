@@ -53,6 +53,8 @@ public:
     double m_collThreshold;
     int m_mapXsize;
     int m_mapYsize;
+    double m_plantime;
+    double m_plancost;
 
 };
 

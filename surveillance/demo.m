@@ -5,14 +5,17 @@ map = ones(8,8); C = 2;
 wayPts = [[4,8];[8,4]];
 starts = [[1,8];[1,8]];
 goals = [[8,1];[8,1]];
-numRobots = size(starts,2);
 
-%[~,C,~,T,map] = readproblem('map3.txt');
+% [~,C,~,T,map] = readproblem('map3.txt');
 % tsz = size(T,1);
-% wayPts = ([T(tsz,:); T(ceil(tsz-(tsz/3)),:); T(ceil(tsz/3),:)])';
+% wayPts = ([T(ceil(tsz-(tsz/3)),:); T(ceil(tsz/3),:)])';
 % starts = ([T(ceil(tsz/4),:); T(ceil(tsz-(tsz/4)),:)])';
 % goals = ([T(ceil(tsz/2),:); T(ceil(tsz/2),:)])';
+% wayPts = ([T(ceil(tsz-(tsz/3)),:)])';
+% starts = ([T(ceil(tsz/4),:)])';
+% goals = ([T(ceil(tsz/2),:)])';
 
+numRobots = size(starts,2);
 [plans, planLengths] = planner(map, C, starts, goals, wayPts);
 
 max_planlength = 0;
@@ -37,7 +40,7 @@ for w=1:size(wayPts,2)
     plot(wayPts(1,w), wayPts(2,w), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
 end
 
-cols = ['b','k']; widths = [5, 2];
+cols = ['g','k']; widths = [2, 1];
 for r = 1:numRobots
     path_robot = squeeze(plans(r,:,:));
     %% Plot path_robot on map 

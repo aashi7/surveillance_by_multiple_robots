@@ -43,6 +43,8 @@ static void planner(
                                                         map, collision_thresh, x_size, y_size);
 	double*** finalPlans; int* finalPlanLengths;
     tie(finalPlans, finalPlanLengths) = MS->RunPlan();
+    cout << "Planning time = " << MS->m_plantime << " s\n";
+    cout << "Total path cost = " << MS->m_plancost << '\n';
     *plansPtr = finalPlans;
     *planLengthsPtr = finalPlanLengths;
 }

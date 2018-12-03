@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+
+#include <time.h>
 #include <boost/functional/hash.hpp>
 
 #include "MultiSurveillance.hpp"
@@ -123,7 +125,7 @@ GraphVertex* MultiSurveillance::TopSearch()
         curr = open.top(); open.pop();
         closed[TopHash(curr)] = 1;
 
-        cout << "\nTop Current:" << *curr << '\n';
+        //cout << "\nTop Current:" << *curr << '\n';
 
         if(IsTopGoal(curr)){ return curr; }
 
@@ -145,7 +147,7 @@ GraphVertex* MultiSurveillance::TopSearch()
                     s->m_parent = vertices[TopHash(curr)];
                     open.push(s);
                 }
-                cout << "\nTop Successor:" << *s << '\n';
+                //cout << "\nTop Successor:" << *s << '\n';
             }
         }
 
@@ -390,6 +392,8 @@ vector<pair<int,int>> MultiSurveillance::BackTrackLowPlan(GraphVertex* midSearch
 
 pair<double***,int*> MultiSurveillance::RunPlan()
 {
+    clock_t begin_time = clock();
+
     vector<vector<pair<int,int>>> finalPlan(m_numRobots);
     vector<pair<int,int>> robotLowPlan, robotPartPlan;
     vector<int> finalPlanLengths(m_numRobots,0);
@@ -408,6 +412,9 @@ pair<double***,int*> MultiSurveillance::RunPlan()
         finalPlan[i] = robotLowPlan;
         finalPlanLengths[i] = finalPlan[i].size();
     }
+
+    m_plantime = double(clock() - begin_time)/CLOCKS_PER_SEC;
+    m_plancost = topSearchPtr->m_gValue;
 
     double*** finalPlanPtr = (double***) malloc(m_numRobots*sizeof(double**));
     for(int i = 0; i < m_numRobots; i++)
