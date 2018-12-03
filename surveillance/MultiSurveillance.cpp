@@ -5,6 +5,7 @@
 #include <limits>
 #include <cmath>
 
+#include <stdlib.h>
 #include <time.h>
 #include <boost/functional/hash.hpp>
 
@@ -390,18 +391,22 @@ vector<pair<int,int>> MultiSurveillance::BackTrackLowPlan(GraphVertex* midSearch
     return backPath;
 }
 
-pair<double***,int*> MultiSurveillance::RunPlan()
+pair<double***,int*> MultiSurveillance::RunPlan(bool isRandom)
 {
     clock_t begin_time = clock();
 
     vector<vector<pair<int,int>>> finalPlan(m_numRobots);
     vector<pair<int,int>> robotLowPlan, robotPartPlan;
     vector<int> finalPlanLengths(m_numRobots,0);
-    GraphVertex *midSearchPtr, *topSearchPtr = TopSearch();
+    GraphVertex *midSearchPtr, *topSearchPtr;
+    if(!isRandom){ topSearchPtr = TopSearch(); }
+    else{ topSearchPtr = RandomAssignment(); }
+    double gValue = 0;
     for(int i = 0 ; i < m_numRobots; i++)
     {
         robotLowPlan = vector<pair<int,int>>();
         midSearchPtr = MidSearch(topSearchPtr,i+1);
+        gValue += midSearchPtr->m_gValue;
         while(midSearchPtr != NULL)
         {
             robotPartPlan = BackTrackLowPlan(midSearchPtr);
@@ -414,7 +419,7 @@ pair<double***,int*> MultiSurveillance::RunPlan()
     }
 
     m_plantime = double(clock() - begin_time)/CLOCKS_PER_SEC;
-    m_plancost = topSearchPtr->m_gValue;
+    m_plancost = gValue;
 
     double*** finalPlanPtr = (double***) malloc(m_numRobots*sizeof(double**));
     for(int i = 0; i < m_numRobots; i++)
@@ -433,4 +438,14 @@ pair<double***,int*> MultiSurveillance::RunPlan()
         finalPlanLengthsPtr[i] = finalPlanLengths[i];
 
     return(pair<double***,int*>(finalPlanPtr,finalPlanLengthsPtr));
+}
+
+GraphVertex* MultiSurveillance::RandomAssignment()
+{
+    GraphVertex* randomAssign = new GraphVertex(vector<int>(m_numWayPts,0), 0,
+                           vector<double>(m_numRobots,0), NULL);
+    for(int i = 0; i < m_numWayPts; i++)
+        randomAssign->m_WayPtAssignment[i] = (rand()%m_numRobots) + 1;
+
+    return randomAssign;
 }

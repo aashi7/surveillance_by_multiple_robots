@@ -6,7 +6,7 @@ wayPts = [[4,8];[8,4]];
 starts = [[1,8];[1,8]];
 goals = [[8,1];[8,1]];
 
-% [~,C,~,T,map] = readproblem('map3.txt');
+% [~,C,~,T,map] = readproblem('maps/map3.txt');
 % tsz = size(T,1);
 % wayPts = ([T(ceil(tsz-(tsz/3)),:); T(ceil(tsz/3),:)])';
 % starts = ([T(ceil(tsz/4),:); T(ceil(tsz-(tsz/4)),:)])';

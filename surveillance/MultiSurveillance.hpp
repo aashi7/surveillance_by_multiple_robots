@@ -41,7 +41,8 @@ public:
     GraphVertex* LowSearch(GraphVertex* start, GraphVertex* goal, int robot);
 
     vector<pair<int,int>> BackTrackLowPlan(GraphVertex* midSearchPtr);
-    pair<double***,int*> RunPlan();
+    pair<double***,int*> RunPlan(bool isRandom);
+    GraphVertex* RandomAssignment();
 
     int m_numWayPts;
     int m_numRobots;
