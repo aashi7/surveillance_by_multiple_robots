@@ -10,7 +10,7 @@ using namespace std;
 GraphVertex::GraphVertex(){}
 
 GraphVertex::GraphVertex(vector<int> perWayPtRobots, int lastWayPt, 
-	vector<double> perRobotCosts, GraphVertex* parent)
+	vector<double> perRobotCosts, GraphVertexPtr_t parent)
 {
     m_WayPtAssignment = perWayPtRobots;
     m_lastAssigned = lastWayPt;

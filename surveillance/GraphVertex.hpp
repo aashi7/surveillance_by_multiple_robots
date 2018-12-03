@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -10,9 +11,10 @@ using namespace std;
 class GraphVertex
 {
 public:
+    typedef std::shared_ptr<GraphVertex> GraphVertexPtr_t;
     GraphVertex();
     GraphVertex(vector<int> perWayPtRobots, int lastWayPt, 
-                vector<double> perRobotCosts, GraphVertex* parent);
+                vector<double> perRobotCosts, GraphVertexPtr_t parent);
     GraphVertex(vector<bool> wayPtsDone, int lastWayPt);
     GraphVertex(pair<int,int> indices, int xsz, int ysz);
     ~GraphVertex();
@@ -29,7 +31,7 @@ public:
     // Vertex for mid level graph - one mid graph per robot
     vector<bool> m_WayPtVisitation;        /*  M vector:   which waypoints have been visited?      */
     int m_lastVisited;                     /*  int id:     which waypoint was visited last?        */
-    GraphVertex* m_lowPtr;                 /*  pointer:    to low search goal (which corresponds
+    GraphVertexPtr_t m_lowPtr;                 /*  pointer:    to low search goal (which corresponds
                                                            to edge from parent)                    */
 
 
@@ -38,7 +40,7 @@ public:
     int m_Xsz; int m_Ysz;                   /*  map size                                            */
 
 
-    GraphVertex* m_parent;                 /*  vertex parent   */
+    GraphVertexPtr_t m_parent;                 /*  vertex parent   */
     double m_gValue;                       /*  cost from start */
     double m_hValue;                       /*  heuristic value */
     double m_fValue;                       /*  priority value  */

@@ -2,7 +2,7 @@ function [plans] = demo()
 close all; clc; clear;
 
 map = ones(8,8); C = 2;
-wayPts = [[4,8];[8,4]];
+wayPts = [[4,8,2,1,4];[8,4,3,5,7]];
 starts = [[1,8];[1,8]];
 goals = [[8,1];[8,1]];
 
