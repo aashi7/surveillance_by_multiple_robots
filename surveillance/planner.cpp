@@ -7,6 +7,7 @@
 #include "mex.h"
 
 #include "MultiSurveillance.hpp"
+#include "GraphVertex.hpp"
 #include "ComparePriority.cpp"
 
 /* Input Arguments */
@@ -42,7 +43,7 @@ static void planner(
                                                         map, collision_thresh, x_size, y_size);
 	double*** finalPlans; int* finalPlanLengths;
     tie(finalPlans, finalPlanLengths) = MS->RunPlan();
-    *plansPtr = finalPlanLengths;
+    *plansPtr = finalPlans;
     *planLengthsPtr = finalPlanLengths;
 }
 
@@ -54,8 +55,8 @@ static void planner(
 //4th is matrix of robot goals (2xnumRobots)
 //5th is matrix of waypoint locations (2xnumWayPts)
 //plhs should contain output parameters (2): 
-//1st is a 3D matrix plan when each plan[i][j] is the 2D position of robot i at jth step of the plan
-//2nd is planlength (int)
+//1st is a 3D matrix plans when each plan[i][j] is the 2D position of robot i at jth step of the plan
+//2nd is array of planlengths (int*)
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray*prhs[])
      
@@ -80,27 +81,28 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
     /* Get number of robots and robot start & goal positions */
     int numRobots = (int) mxGetN(ROBSTARTS_IN);
-    int* rob_starts = mxGetPr(ROBSTARTS_IN);
-    int* rob_goals = mxGetPr(ROBGOALS_IN);
+    double* rob_starts = mxGetPr(ROBSTARTS_IN);
+    double* rob_goals = mxGetPr(ROBGOALS_IN);
 
     vector<pair<int,int>> starts(numRobots);
+    vector<pair<int,int>> goals(numRobots);
     for(int i = 0; i < numRobots; i++)
     {
-        starts[i].first = rob_starts[2*i];
-        starts[i].second = rob_starts[2*i+1];
-        goals[i].first = rob_goals[2*i];
-        goals[i].second = rob_goals[2*i+1];
+        starts[i].first = (int) rob_starts[2*i];
+        starts[i].second = (int) rob_starts[2*i+1];
+        goals[i].first = (int) rob_goals[2*i];
+        goals[i].second = (int) rob_goals[2*i+1];
     }
 
     /* Get number of waypoints and waypoint locations */
     int numWayPts = (int) mxGetN(WAYPTS_IN);
-    int* waypt_pos = mxGetPr(WAYPTS_IN);
+    double* waypt_pos = mxGetPr(WAYPTS_IN);
 
     vector<pair<int,int>> wayPts(numWayPts);
     for(int i = 0; i < numWayPts; i++)
     {
-        wayPts[i].first = waypt_pos[2*i];
-        wayPts[i].second = waypt_pos[2*i+1];
+        wayPts[i].first = (int) waypt_pos[2*i];
+        wayPts[i].second = (int) waypt_pos[2*i+1];
     }
 
     /* Do the actual planning */
@@ -114,16 +116,21 @@ void mexFunction( int nlhs, mxArray *plhs[],
         if(planlengths[i] > max_planlength)
             max_planlength = planlengths[i];
 
-    const mwSize *out_dims = (const mwSize*) malloc(3*sizeof(mwSize));
-    out_dims[0] = (mwSize)numRobots; out_dims[1] = (mwSize)max_planlength; out_dims[2] = (mwSize)2;
+    const mwSize out_dims[3] = {(mwSize)numRobots, (mwSize)max_planlength, (mwSize)2};
 
-    PLAN_OUT = mxCreateNumericMatrix( (mwSize)3, out_dims, mxDOUBLE_CLASS, mxREAL); 
+    PLANS_OUT = mxCreateNumericArray( (mwSize)3, out_dims, mxDOUBLE_CLASS, mxREAL); 
     double* plans_out = mxGetPr(PLANS_OUT);        
 
     for(int i = 0; i < numRobots; i++)
+    {
         for(int j = 0; j < planlengths[i]; j++)
             for (int k = 0; k < 2; k++)
                 plans_out[k*max_planlength*numRobots + j*numRobots + i] = plans[i][j][k];
+        for(int j = planlengths[i]; j < max_planlength; j++)
+            for (int k = 0; k < 2; k++)
+                plans_out[k*max_planlength*numRobots + j*numRobots + i] = plans[i][planlengths[i]-1][k];
+    }
+
 
     PLANLENGTHS_OUT = mxCreateNumericMatrix( (mwSize)numRobots, (mwSize)1, mxINT8_CLASS, mxREAL); 
     int* planlengths_out = (int*) mxGetPr(PLANLENGTHS_OUT);

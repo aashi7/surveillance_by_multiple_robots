@@ -184,6 +184,7 @@ void MultiSurveillance::MidInitOpen(GraphVertex* current, unordered_map<int, Gra
     current = new GraphVertex(vector<bool>(m_numWayPts,0), 0);
     current->SetFValue(0,0);
     current->m_parent = NULL;
+    current->m_lowPtr = NULL;
     (*vertices)[MidHash(current)] = current;
     (*open).push(current);
 }
@@ -222,7 +223,7 @@ pair<double,GraphVertex*> MultiSurveillance::MidPath(GraphVertex* current, Graph
 GraphVertex* MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
 {
     GraphVertex* end = MidVertex(goal,robot);
-    cout << "\nMid Goal:" << *end << '\n';
+    //cout << "\nMid Goal:" << *end << '\n';
 
     priority_queue<GraphVertex*, vector<GraphVertex*>, ComparePriority> open;
     unordered_map<int, bool> closed;
@@ -237,7 +238,7 @@ GraphVertex* MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
         curr = open.top(); open.pop();
         closed[MidHash(curr)] = 1;
 
-        cout << "\nMid Current:" << *curr << '\n';
+        //cout << "\nMid Current:" << *curr << '\n';
 
         if(IsMidGoal(curr,end)){ return curr; }
 
@@ -260,7 +261,7 @@ GraphVertex* MultiSurveillance::MidSearch(GraphVertex* goal, int robot)
                     s->m_lowPtr = lowSearch;
                     open.push(s);
                 }
-                cout << "\nMid Successor:" << *s << '\n';
+                //cout << "\nMid Successor:" << *s << '\n';
             }
         }
     }
@@ -297,8 +298,8 @@ vector<GraphVertex*> MultiSurveillance::LowSuccessors(GraphVertex* vertex)
 {
     vector<GraphVertex*> succ;
     GraphVertex* s; int n_X, n_Y;
-    vector<int> dX{-1, -1, -1,  0,  0,  1, 1, 1};
-    vector<int> dY{-1,  0,  1, -1,  1, -1, 0, 1};
+    vector<int> dX{-1, -1, 1,  1,  0, 0, 1, -1};
+    vector<int> dY{-1,  1, 1, -1, -1, 1, 0,  0};
     for(int i = 0; i < dX.size(); i++)
     {
         n_X = vertex->m_X + dX[i];
