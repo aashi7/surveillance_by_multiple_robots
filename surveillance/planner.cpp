@@ -42,7 +42,9 @@ static void planner(
 	MultiSurveillance *MS = new MultiSurveillance(numWayPts, numRobots, wayPts, starts, goals, 
                                                         map, collision_thresh, x_size, y_size);
 	double*** finalPlans; int* finalPlanLengths;
-    tie(finalPlans, finalPlanLengths) = MS->RunPlan();
+    tie(finalPlans, finalPlanLengths) = MS->RunPlan(false); //false for optimal search, true for random top-level assignment
+    cout << "Planning time = " << MS->m_plantime << " s\n";
+    cout << "Total path cost = " << MS->m_plancost << '\n';
     *plansPtr = finalPlans;
     *planLengthsPtr = finalPlanLengths;
 }
