@@ -48,6 +48,7 @@ public:
     GraphVertexPtr_t RandomAssignment();
     GraphVertexPtr_t GreedyAssignment();
     double SqrEucDist(pair<int,int> s, pair<int,int> g);
+    GraphVertexPtr_t LowSearchGreedy(pair<int,int> start, pair<int,int> goal);
 
     int m_numWayPts;
     int m_numRobots;

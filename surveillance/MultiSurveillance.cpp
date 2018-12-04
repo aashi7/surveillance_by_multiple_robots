@@ -458,7 +458,7 @@ MultiSurveillance::GraphVertexPtr_t MultiSurveillance::GreedyAssignment()
     GraphVertexPtr_t greedyAssign = shared_ptr<GraphVertex>(new GraphVertex(vector<int>(m_numWayPts,0), 0,
                                                             vector<double>(m_numRobots,0), NULL));
     vector<pair<int,int>> robPoses = m_starts;
-    double eucDist, minDist; int robAssign, wayptAssign;
+    double dist, minDist; int robAssign, wayptAssign;
     bool assigned = true; 
     while(assigned)
     {
@@ -470,16 +470,21 @@ MultiSurveillance::GraphVertexPtr_t MultiSurveillance::GreedyAssignment()
                 assigned = true;
                 for(int i = 0; i < m_numRobots; i++)
                 {
-                    eucDist = SqrEucDist(robPoses[i], m_wayPts[j]);
-                    if(eucDist < minDist)
+                    //dist = SqrEucDist(robPoses[i], m_wayPts[j]);
+                    dist = SearchCost(LowSearchGreedy(robPoses[i], m_wayPts[j]));
+                    if(dist < minDist)
                     {
-                        minDist = eucDist;
+                        minDist = dist;
                         robAssign = i;
                         wayptAssign = j;
                     }
                 }
             }
-        if(assigned){ greedyAssign->m_WayPtAssignment[wayptAssign] = robAssign+1; }
+        if(assigned)
+        { 
+            greedyAssign->m_WayPtAssignment[wayptAssign] = robAssign+1; 
+            robPoses[robAssign] = m_wayPts[wayptAssign];
+        }
     }
     return greedyAssign;
 }
@@ -487,4 +492,53 @@ MultiSurveillance::GraphVertexPtr_t MultiSurveillance::GreedyAssignment()
 double MultiSurveillance::SqrEucDist(pair<int,int> s, pair<int,int> g)
 {
     return(pow(s.first-g.first,2) + pow(s.second-g.second,2));
+}
+
+MultiSurveillance::GraphVertexPtr_t MultiSurveillance::LowSearchGreedy(pair<int,int> start, pair<int,int> goal)
+{
+    pair<int,int> s, g;
+    s = start;
+    g = goal;
+
+    // 1-indexed from matlab => 0-indexing (required for c++)
+    s.first = s.first - 1; s.second = s.second - 1; g.first = g.first - 1; g.second = g.second - 1;
+
+    priority_queue<GraphVertexPtr_t, vector<GraphVertexPtr_t>, ComparePriority> open;
+    unordered_map<int, bool> closed;
+    unordered_map<int, GraphVertexPtr_t> vertices;
+
+    double gVal_s; int hash_s;
+    GraphVertexPtr_t curr; vector<GraphVertexPtr_t> succ;
+    LowInitOpen(s, curr, &vertices, &open);
+    while(!open.empty())
+    {
+        while(closed[LowHash(open.top())]){ open.pop();}
+        curr = open.top(); open.pop();
+        closed[LowHash(curr)] = 1;
+
+        if(IsLowGoal(curr,g)){ return curr; }
+
+        succ = LowSuccessors(curr);
+        for(GraphVertexPtr_t s: succ)
+        {
+            hash_s = LowHash(s);
+            if(!closed[hash_s])
+            {
+                gVal_s = LowPathCost(curr, s);
+                s->SetFValue(gVal_s,0);
+
+                if(vertices[hash_s] == NULL) { vertices[hash_s] = s; }
+                else { s = vertices[hash_s]; }
+                
+                if(gVal_s <= vertices[hash_s]->m_gValue)
+                {
+                    s->SetFValue(gVal_s,0);
+                    s->m_parent = vertices[LowHash(curr)];
+                    open.push(s);
+                }
+            }
+        }
+    }
+    
+    return NULL;
 }
