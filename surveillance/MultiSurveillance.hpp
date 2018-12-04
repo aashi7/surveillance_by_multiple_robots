@@ -44,8 +44,10 @@ public:
     GraphVertexPtr_t LowSearch(GraphVertexPtr_t start, GraphVertexPtr_t goal, int robot);
 
     vector<pair<int,int>> BackTrackLowPlan(GraphVertexPtr_t midSearchPtr);
-    pair<double***,int*> RunPlan(bool isRandom);
+    pair<double***,int*> RunPlan(int assignmentType);
     GraphVertexPtr_t RandomAssignment();
+    GraphVertexPtr_t GreedyAssignment();
+    double SqrEucDist(pair<int,int> s, pair<int,int> g);
 
     int m_numWayPts;
     int m_numRobots;

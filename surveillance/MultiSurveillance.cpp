@@ -391,7 +391,7 @@ vector<pair<int,int>> MultiSurveillance::BackTrackLowPlan(GraphVertexPtr_t midSe
     return backPath;
 }
 
-pair<double***,int*> MultiSurveillance::RunPlan(bool isRandom)
+pair<double***,int*> MultiSurveillance::RunPlan(int assignmentType)
 {
     clock_t begin_time = clock();
 
@@ -399,8 +399,11 @@ pair<double***,int*> MultiSurveillance::RunPlan(bool isRandom)
     vector<pair<int,int>> robotLowPlan, robotPartPlan;
     vector<int> finalPlanLengths(m_numRobots,0);
     GraphVertexPtr_t midSearchPtr, topSearchPtr;
-    if(!isRandom){ topSearchPtr = TopSearch(); }
-    else{ topSearchPtr = RandomAssignment(); }
+
+    if(assignmentType == 0){ topSearchPtr = TopSearch(); }
+    else if(assignmentType == 1){ topSearchPtr = RandomAssignment(); }
+    else if(assignmentType == 2){ topSearchPtr = GreedyAssignment(); }
+
     double gValue = 0;
     for(int i = 0 ; i < m_numRobots; i++)
     {
@@ -443,9 +446,45 @@ pair<double***,int*> MultiSurveillance::RunPlan(bool isRandom)
 MultiSurveillance::GraphVertexPtr_t MultiSurveillance::RandomAssignment()
 {
     GraphVertexPtr_t randomAssign = shared_ptr<GraphVertex>(new GraphVertex(vector<int>(m_numWayPts,0), 0,
-                           vector<double>(m_numRobots,0), NULL));
+                                                            vector<double>(m_numRobots,0), NULL));
     for(int i = 0; i < m_numWayPts; i++)
         randomAssign->m_WayPtAssignment[i] = (rand()%m_numRobots) + 1;
 
     return randomAssign;
+}
+
+MultiSurveillance::GraphVertexPtr_t MultiSurveillance::GreedyAssignment()
+{
+    GraphVertexPtr_t greedyAssign = shared_ptr<GraphVertex>(new GraphVertex(vector<int>(m_numWayPts,0), 0,
+                                                            vector<double>(m_numRobots,0), NULL));
+    vector<pair<int,int>> robPoses = m_starts;
+    double eucDist, minDist; int robAssign, wayptAssign;
+    bool assigned = true; 
+    while(assigned)
+    {
+        assigned = false;
+        minDist = D_INF;
+        for(int j = 0; j < m_numWayPts; j++)
+            if(greedyAssign->m_WayPtAssignment[j] == 0)
+            {
+                assigned = true;
+                for(int i = 0; i < m_numRobots; i++)
+                {
+                    eucDist = SqrEucDist(robPoses[i], m_wayPts[j]);
+                    if(eucDist < minDist)
+                    {
+                        minDist = eucDist;
+                        robAssign = i;
+                        wayptAssign = j;
+                    }
+                }
+            }
+        if(assigned){ greedyAssign->m_WayPtAssignment[wayptAssign] = robAssign+1; }
+    }
+    return greedyAssign;
+}
+
+double MultiSurveillance::SqrEucDist(pair<int,int> s, pair<int,int> g)
+{
+    return(pow(s.first-g.first,2) + pow(s.second-g.second,2));
 }

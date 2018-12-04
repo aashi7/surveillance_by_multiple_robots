@@ -13,7 +13,7 @@ using namespace std;
 class ComparePriority
 {
 public:
-	typedef std::shared_ptr<GraphVertex> GraphVertexPtr_t;
+    typedef std::shared_ptr<GraphVertex> GraphVertexPtr_t;
     bool operator () (GraphVertexPtr_t a, GraphVertexPtr_t b) const {
         return (a->m_fValue > b->m_fValue);}
 };

@@ -31,7 +31,7 @@ public:
     // Vertex for mid level graph - one mid graph per robot
     vector<bool> m_WayPtVisitation;        /*  M vector:   which waypoints have been visited?      */
     int m_lastVisited;                     /*  int id:     which waypoint was visited last?        */
-    GraphVertexPtr_t m_lowPtr;                 /*  pointer:    to low search goal (which corresponds
+    GraphVertexPtr_t m_lowPtr;             /*  pointer:    to low search goal (which corresponds
                                                            to edge from parent)                    */
 
 
@@ -40,7 +40,7 @@ public:
     int m_Xsz; int m_Ysz;                   /*  map size                                            */
 
 
-    GraphVertexPtr_t m_parent;                 /*  vertex parent   */
+    GraphVertexPtr_t m_parent;             /*  vertex parent   */
     double m_gValue;                       /*  cost from start */
     double m_hValue;                       /*  heuristic value */
     double m_fValue;                       /*  priority value  */

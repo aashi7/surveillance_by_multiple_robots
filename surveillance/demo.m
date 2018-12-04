@@ -1,19 +1,22 @@
 function [plans] = demo()
 close all; clc; clear;
 
-map = ones(8,8); C = 2;
-wayPts = [[4,8,2,1,4];[8,4,3,5,7]];
-starts = [[1,8];[1,8]];
-goals = [[8,1];[8,1]];
+% map = ones(8,8); C = 2;
+% wayPts = [[4,8,2,1,4];[8,4,3,5,7]];
+% starts = [[1,8];[1,8]];
+% goals = [[8,1];[8,1]];
 
-% [~,C,~,T,map] = readproblem('maps/map3.txt');
+[~,C,~,T,map] = readproblem('maps/map3.txt');
+
 % tsz = size(T,1);
-% wayPts = ([T(ceil(tsz-(tsz/3)),:); T(ceil(tsz/3),:)])';
+% wayPts = ([T(tsz,:); T(ceil(tsz-(tsz/3)),:); T(ceil(tsz/3),:)])';
 % starts = ([T(ceil(tsz/4),:); T(ceil(tsz-(tsz/4)),:)])';
 % goals = ([T(ceil(tsz/2),:); T(ceil(tsz/2),:)])';
-% wayPts = ([T(ceil(tsz-(tsz/3)),:)])';
-% starts = ([T(ceil(tsz/4),:)])';
-% goals = ([T(ceil(tsz/2),:)])';
+
+starts = [28, 84, 192; 24, 240, 344];
+goals = [430, 430, 430; 186, 186, 186];
+wayPts = [265, 370, 378, 85, 276; 70, 356, 24, 60, 234];
+% wayPts = [238, 225, 371; 328, 297, 300];
 
 numRobots = size(starts,2);
 [plans, planLengths] = planner(map, C, starts, goals, wayPts);
@@ -40,7 +43,7 @@ for w=1:size(wayPts,2)
     plot(wayPts(1,w), wayPts(2,w), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
 end
 
-cols = ['g','k']; widths = [2, 1];
+cols = ['g','k', 'm']; widths = [2, 1, 1];
 for r = 1:numRobots
     path_robot = squeeze(plans(r,:,:));
     %% Plot path_robot on map 
