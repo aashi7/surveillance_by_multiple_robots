@@ -13,8 +13,8 @@ close all; clc; clear;
 % starts = ([T(ceil(tsz/4),:); T(ceil(tsz-(tsz/4)),:)])';
 % goals = ([T(ceil(tsz/2),:); T(ceil(tsz/2),:)])';
 
-starts = [28, 50, 192; 24, 125, 344];
-% starts = [28, 84, 192; 24, 240, 344];
+% starts = [28, 50, 192; 24, 125, 344];
+starts = [28, 84, 192; 24, 240, 344];
 goals = [430, 430, 430; 186, 186, 186];
 wayPts = [265, 370, 378, 85, 276, 50, 110; 70, 356, 24, 60, 234, 190, 290];
 % wayPts = [265, 370, 378, 85, 276; 70, 356, 24, 60, 234];
@@ -22,8 +22,13 @@ wayPts = [265, 370, 378, 85, 276, 50, 110; 70, 356, 24, 60, 234, 190, 290];
 
 numRobots = size(starts,2);
 
+video = VideoWriter('videos/test1.avi');
+open(video);
+
 figure('units','normalized','outerposition',[0 0 1 1]);
-imagesc(map'); axis square; colorbar; colormap jet; hold on;
+mycolMap = jet(256);
+mycolMap(1,:) = 1;
+imagesc(map'); axis square; colorbar; colormap(mycolMap); hold on;
 % figure
 % imagesc(map);
 %%%% Mark waypoints and robot starts on map %%%%
@@ -37,20 +42,20 @@ for w=1:size(wayPts,2)
     plot(wayPts(1,w), wayPts(2,w), 'h', 'MarkerFaceColor', [1,0,0], 'MarkerSize', 30);
 end
 
-[plans, planLengths] = planner(map, C, starts, goals, wayPts);
-max_planlength = 0;
-for i=1:numRobots
-    if(planLengths(i) > max_planlength)
-        max_planlength = planLengths(i);
-    end
-end
+[plans, ~] = planner(map, C, starts, goals, wayPts);
+max_planlength = size(plans,2);
 
-cols = ['g','k', 'm']; widths = [2, 1, 1];
-for r = 1:numRobots
-    path_robot = squeeze(plans(r,:,:));
-    %% Plot path_robot on map 
-    %% assign color to the path 
-    col = cols(r); width = widths(r);
-    %% Map grid coordinates to (x,y)
-    plot(path_robot(:,1)+1, path_robot(:,2)+1, '-o', 'LineWidth', width, 'Color', col);
+cols = ['g','g','g']; widths = [2, 2, 2];
+for t = 1:max_planlength
+    for r = 1:numRobots
+        path_robot = squeeze(plans(r,:,:));
+        %% Plot path_robot on map 
+        %% assign color to the path 
+        col = cols(r); width = widths(r);
+        %% Map grid coordinates to (x,y)
+        plot(path_robot(t,1)+1, path_robot(t,2)+1, '.', 'LineWidth', width, 'Color', col);
+    end
+    drawnow;
+    frame = getframe(gcf);
+    writeVideo(video, frame);
 end
