@@ -84,10 +84,11 @@ double TopGraph::TopPathCost(TopGraph::TopVertex* current, TopGraph::TopVertex* 
         {
 
         	MidGraph::MidGraph *GM = new MidGraph(m_numWayPts, m_starts, m_goals, m_wayPts, m_map, m_CollThresh, m_Xsz , m_Ysz);
-            vector<MidGraph::MidVertex*> mid_level_path = GM->MidSearch(successor->m_WayPtAssignment, i+1);
+            //vector<MidGraph::MidVertex*> mid_level_path = GM->MidSearch(successor->m_WayPtAssignment, i+1);
+            double MidSearchCost = GM->MidSearchCost(successor->m_WayPtAssignment,i+1);
             GM->~MidGraph();
 
-            double MidSearchCost = mid_level_path.back()->m_gValue;
+            //double MidSearchCost = mid_level_path.back()->m_gValue;
             //gVal_s += MidSearch(successor, i+1);
             gVal_s += MidSearchCost;
         }
@@ -154,7 +155,7 @@ vector<vector<pair<int, int>>> TopGraph::TopSearch()
                     if (s->m_lastAssigned > 0) 
                     {
                     	MidGraph::MidGraph *GM = new MidGraph(m_numWayPts, m_starts, m_goals, m_wayPts, m_map, m_CollThresh, m_Xsz, m_Ysz);
-                        s->m_mid_level_path = GM->MidSearch(s->m_WayPtAssignment,s->m_WayPtAssignment[s->m_lastAssigned-1]); // else how the path will be assigned - will look into
+                        //s->m_mid_level_path = GM->MidSearch(s->m_WayPtAssignment,s->m_WayPtAssignment[s->m_lastAssigned-1]); // else how the path will be assigned - will look into
                         GM->~MidGraph();
                     }
                     // if (s->m_lastAssigned == 0)
