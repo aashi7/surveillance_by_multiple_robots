@@ -63,6 +63,7 @@ class TopGraph
 		int TopHash(TopVertex* vertex);
 		double TopPathCost(TopVertex* current, TopVertex* successor); 
 		vector<vector<pair<int, int>>> TopSearch();
+		vector<vector<pair<int, int>>> GreedyAssignment();
 };
 
 #endif 
