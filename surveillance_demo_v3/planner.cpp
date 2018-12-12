@@ -50,8 +50,8 @@ void planner(double* map, int collision_thresh, int x_size, int y_size, vector<p
 	clock_t begin_time;
 	begin_time = clock();
 	TopGraph::TopGraph *GT = new TopGraph(M, N, wayPts, starts, goals, map, collision_thresh, x_size, y_size);
-	vector<vector<pair<int,int>>> paths_of_all_robots = GT->TopSearch();
-	//vector<vector<pair<int,int>>> paths_of_all_robots = GT->GreedyAssignment();
+	//vector<vector<pair<int,int>>> paths_of_all_robots = GT->TopSearch();
+	vector<vector<pair<int,int>>> paths_of_all_robots = GT->GreedyAssignment();
 	cout <<  "Planning time: " << float(clock() - begin_time)/CLOCKS_PER_SEC << endl;
 	GT->~TopGraph();
 

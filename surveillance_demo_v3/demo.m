@@ -1,4 +1,4 @@
-function [plan] = demo()
+function [plans] = demo()
 
 close all;clear;
 

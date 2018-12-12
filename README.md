@@ -5,9 +5,9 @@ Demo:
 
 Compilation 
 
-Inside surveillance_demo_v2:
+Inside surveillance_demo_v3:
 
-mex mex_planner.cpp GraphVertex.cpp MultiSurveillance.cpp ComparePriority.cpp
+mex planner.cpp MidGraph.cpp LowGraph.cpp TopGraph.cpp  ComparePriorityLow.cpp ComparePriorityMid.cpp ComparePriorityHigh.cpp
 
 Run:
 
