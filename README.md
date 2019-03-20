@@ -12,3 +12,5 @@ mex planner.cpp MidGraph.cpp LowGraph.cpp TopGraph.cpp  ComparePriorityLow.cpp C
 Run:
 
 [plan]=demo()
+
+![](demo.gif)
