@@ -14,4 +14,4 @@ Run:
 In MATLAB
 `[plan]=demo()`
 
-![](demo.gif)
+![](results/demo.gif)
