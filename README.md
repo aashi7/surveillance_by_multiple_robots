@@ -3,15 +3,15 @@ Surveillance by multiple robots
 
 Demo:
 
-Build:
+To Build - 
 
-Inside `src/`
+`cd src/`
 
 `mex planner.cpp MidGraph.cpp LowGraph.cpp TopGraph.cpp  ComparePriorityLow.cpp ComparePriorityMid.cpp ComparePriorityHigh.cpp`
 
-Run:
+To Run - 
 
-In MATLAB
+In MATLAB  
 `[plan]=demo()`
 
 ![](results/demo.gif)
